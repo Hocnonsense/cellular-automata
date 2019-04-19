@@ -1,36 +1,63 @@
 package autocell;
 
-import java.awt.Color;
-import java.awt.GridLayout;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class Utils {
-  public static JFrame launchFrame(final JComponent content) {
-	 JFrame ret = new JFrame("My frame");
-	 ret.setAlwaysOnTop(true);
-	 content.setOpaque(false);		 // what ever is OK
-	 JPanel wrapper = new JPanel(new GridLayout(1, 1));
-	 wrapper.add(content);wrapper.setBackground(Color.PINK);
-	 ret.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		 //how to close
-	 ret.setContentPane(wrapper);
-	 ret.setSize(800, 600);
-	 ret.setLocationRelativeTo(null);
-	 ret.setVisible(true);
-	 Thread t = new Thread(new Runnable(){
-		@Override
-		public void run(){
-		  while(true){
-			 content.repaint();
-			 try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
-				//Refresh the JFrame
-		  }
+	private JFrame ret = new JFrame("My frame");
+	private JLayeredPane lydp = new JLayeredPane();
+	private JPanel wrapper = new JPanel(new GridLayout(1, 1));
+	private JButton close = new JButton("close");
+	private static JComponent content;
+	private static Utils u;
+	public Utils(final JComponent content) {
+		close.setBounds(100,100,70,40);
+		close.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (e.getSource() == close) {System.exit(0);}
+			}
+		});
+		wrapper.add(content);
+		ret.setLayeredPane(lydp);
+		ret.setContentPane(wrapper);
+		if(undecorated) ret.setSize(1320, 700);else ret.setSize(280, 179);
+		ret.setLocationRelativeTo(content);
+		if(showClose) {
+			if (alwaysShowClose) {lydp.add(close, JLayeredPane.MODAL_LAYER); }
+			else {lydp.add(close); }
 		}
-	 });
-	 //建立一个repaint()的线程
-	 t.setDaemon(true);
-	 t.start();
-	 return ret;
-  }
+		ret.setAlwaysOnTop(alwaysOnTop);
+		ret.setUndecorated(undecorated);				//don't show the edge
+		try {ret.setOpacity(0.5f);}	catch(Exception e){/* if undecorated == false, do nothing*/}
+		ret.setVisible(true);
+	}
+	public static Utils launchFrame(final JComponent content) {
+		Utils.content=content;
+		Utils.u = new Utils(content);
+		Thread t = new Thread(new Runnable(){
+			@Override
+			public void run(){
+				while(true){
+					content.repaint();
+					try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
+				}
+			}
+		});
+		t.setDaemon(true);
+		t.start();
+		return u;
+	}
+	
+	private static boolean undecorated = false;
+	private static boolean alwaysOnTop = false;
+	private static boolean showClose = true;
+	private static boolean alwaysShowClose = false;
+	public void undecorated() {Utils.undecorated=!Utils.undecorated; loadControl(); }
+	public void alwaysOnTop() {Utils.alwaysOnTop=!Utils.alwaysOnTop; loadControl(); }
+	public void showClose() {Utils.showClose=!Utils.showClose; loadControl(); }
+	public void alwaysShowClose() {Utils.alwaysShowClose=!Utils.alwaysShowClose; loadControl(); }
+	@SuppressWarnings("deprecation")
+	public static void loadControl() {Utils.u.ret.hide(); Utils.u = new Utils(content); }
 }
