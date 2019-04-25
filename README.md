@@ -3,4 +3,4 @@ Cellular Automata generator
 
 
 A Main.java with a package.
-the cells.class is in GameOfLife. 
+You can watch it while working!
