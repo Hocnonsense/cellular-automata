@@ -9,18 +9,15 @@ public class Cells {
 	public Color c = Color.BLACK;
 	
 	public Cells() {}
-	public Cells(Random rdm) {
-		this.alive = true;
-		this.c=new Color(rdm.nextInt(256), rdm.nextInt(256), rdm.nextInt(256));
-	}public Cells(Color c){
-		this.alive=true;
-		this.c=c;
-	}
+	public Cells(Random rdm) {this.alive = true; this.c=new Color(rdm.nextInt(256), rdm.nextInt(256), rdm.nextInt(256)); }
+	public Cells(Color c) {this.alive=true; this.c=c; }
+	
+	/** to load and save data of this file */
 	public static Cells[][] loadCells(String name) throws Exception {
-		@SuppressWarnings("resource")
-		BufferedReader ir = new BufferedReader(new FileReader(name));
+		@SuppressWarnings("resource") BufferedReader ir = new BufferedReader(new FileReader(name));
 		String[] tempS = ir.readLine().split("\\s+");
-		if(!tempS[0].startsWith(">"))throw new Exception("data illigial"); int width = Integer.valueOf(tempS[1]); int height = Integer.valueOf(tempS[2]);
+		if(!tempS[0].startsWith(">"))throw new Exception("data illigial");
+		int width = Integer.valueOf(tempS[1]); int height = Integer.valueOf(tempS[2]);
 		Cells[][] lcgrid = new Cells[width][height];
 		for (int w = 0; w != width; ++w) {for (int h = 0; h != height; ++h) {lcgrid[w][h]=new Cells(); } }
 		String tmpreadline;
